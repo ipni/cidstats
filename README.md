@@ -15,6 +15,19 @@ A small static website that charts the provider metering data published at
 - **All providers:** filterable, sortable table. Peer IDs are shortened in the
   UI; hover for the full ID, click to copy.
 
+## Provider names
+
+The metering data only has peer IDs, so names are looked up in the browser and
+are best-effort. In order of priority:
+
+1. `names.json`: a curated map of peer ID to display name, e.g.
+   `{"12D3KooW...": "Example Provider"}`. Edit this file to name providers.
+2. The Filfox tag for a Filecoin storage provider ID (like `f02620`) found in
+   the provider's registry address.
+3. The hostname from the provider's address in <https://cid.contact/providers>.
+
+If a lookup fails the peer ID is shown. Names are not verified.
+
 ## Run locally
 
 ```bash

@@ -65,10 +65,11 @@
 
   <section class="panel">
     <h2>All providers</h2>
-    <input id="filter" type="search" placeholder="Filter by provider ID…" aria-label="Filter providers">
+    <input id="filter" type="search" placeholder="Filter by name or provider ID…" aria-label="Filter providers">
     <div class="tablewrap">
       <table id="table">
         <thead><tr>
+          <th data-key="Name">Name</th>
           <th data-key="ProviderID">Provider ID</th>
           <th data-key="Multihashes" class="num">Multihashes</th>
           <th data-key="Slots" class="num">Slots</th>
@@ -80,7 +81,7 @@
     <p id="count" class="sub"></p>
   </section>
 </main>
-<footer>Data is fetched live from <a href="https://cid.contact/metering/providers">cid.contact/metering/providers</a>.</footer>
+<footer>Data is fetched live from <a href="https://cid.contact/metering/providers">cid.contact/metering/providers</a>. Provider names are hints, not verified: they come from the IPNI provider registry address, a public Filfox tag for Filecoin storage providers, or a curated list. Hover a name for its source.</footer>
 <script src="app.js"></script>
 </body>
 </html>

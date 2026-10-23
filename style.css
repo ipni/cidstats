@@ -43,7 +43,7 @@ select,input[type=search]{font:inherit;color:var(--fg);padding:6px 10px;border:1
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 input[type=search]{width:100%;max-width:420px;margin-bottom:12px}
 
-.bar-row{display:grid;grid-template-columns:130px 1fr 72px;gap:10px;align-items:center;margin:5px 0;font-size:.82rem}
+.bar-row{display:grid;grid-template-columns:190px 1fr 72px;gap:10px;align-items:center;margin:5px 0;font-size:.82rem}
 .bar-row .id{font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bar-row .val{text-align:right;font:500 .82rem var(--mono);font-variant-numeric:tabular-nums}
 .bar-track{height:16px;min-width:0}
@@ -52,7 +52,7 @@ input[type=search]{width:100%;max-width:420px;margin-bottom:12px}
   -webkit-mask:repeating-linear-gradient(90deg,#000 0 9px,transparent 9px 12px);mask:repeating-linear-gradient(90deg,#000 0 9px,transparent 9px 12px)}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
 .grid2>*{min-width:0}
-@media(max-width:700px){.grid2{grid-template-columns:1fr}.bar-row{grid-template-columns:96px 1fr 60px}.head-inner{gap:16px}.logo{width:72px;height:72px}}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}.bar-row{grid-template-columns:110px 1fr 60px}.head-inner{gap:16px}.logo{width:72px;height:72px}}
 .share .bar-row{grid-template-columns:64px 1fr 56px}
 .hist{display:flex;align-items:flex-end;gap:6px;height:170px}
 .hist .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font:400 .7rem var(--mono);color:var(--muted)}
@@ -72,3 +72,5 @@ td.id{font-family:var(--mono)}
 tbody tr:hover{background:var(--card)}
 footer{padding-block:24px 40px;color:var(--muted);font-size:.8rem}
 @media(prefers-reduced-motion:no-preference){.bar-fill{transition:width .4s ease}}
+
+td.name{white-space:nowrap}

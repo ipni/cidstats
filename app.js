@@ -12,7 +12,14 @@ function human(n, unit) {
   return n.toFixed(n >= 100 || i === 0 ? 0 : 1) + (unit === "B" ? " " : "") + units[i];
 }
 
+const REGISTRY_URL = "https://cid.contact/providers";
+const FILFOX_URL = "https://filfox.info/api/v1/address/";
+
 let providers = [];
+// Display names, strongest first: names.json (curated), Filfox tag, registry hostname.
+let curated = {}, filfoxNames = new Map(), hosts = new Map(), spOf = new Map();
+const nameOf = id => curated[id] || filfoxNames.get(id) || hosts.get(id) || "";
+const sourceOf = id => curated[id] ? "curated name" : filfoxNames.has(id) ? "Filfox tag for " + spOf.get(id) : hosts.has(id) ? "IPNI registry address" : "";
 let sortKey = "Multihashes", sortAsc = false;
 
 async function load() {
@@ -24,6 +31,7 @@ async function load() {
     $("measured").textContent = "measured " + new Date(data.MeasuredAt).toUTCString();
     renderTotals(data.Totals);
     renderBars(); renderShare(); renderHist(); renderTable();
+    enrich();
   } catch (e) {
     const err = $("error");
     err.hidden = false;
@@ -31,6 +39,45 @@ async function load() {
     $("measured").textContent = "unavailable";
   }
 }
+
+async function getJSON(url) {
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+
+const hostOf = addrs => {
+  for (const a of addrs || []) {
+    const m = /^\/dns[46]?\/([^/]+)/.exec(a);
+    if (m) return m[1];
+  }
+  return "";
+};
+
+// Names are best-effort: any source that fails is skipped and the peer ID is shown instead.
+async function enrich() {
+  const [reg, names] = await Promise.allSettled([getJSON(REGISTRY_URL), getJSON("names.json")]);
+  if (names.status === "fulfilled") curated = names.value;
+  if (reg.status === "fulfilled") {
+    for (const r of reg.value) {
+      const id = r.AddrInfo && r.AddrInfo.ID;
+      const host = hostOf(r.Publisher && r.Publisher.Addrs) || hostOf(r.AddrInfo && r.AddrInfo.Addrs);
+      if (!id || !host) continue;
+      hosts.set(id, host);
+      const sp = /\bf0\d+\b/.exec(host);
+      if (sp) spOf.set(id, sp[0]);
+    }
+  }
+  refresh();
+  const sps = [...new Set(spOf.values())];
+  const tags = await Promise.allSettled(sps.map(sp => getJSON(FILFOX_URL + sp)));
+  const tagOf = new Map();
+  tags.forEach((t, i) => { if (t.status === "fulfilled" && t.value.tag && t.value.tag.name) tagOf.set(sps[i], t.value.tag.name); });
+  for (const [id, sp] of spOf) if (tagOf.has(sp)) filfoxNames.set(id, tagOf.get(sp));
+  refresh();
+}
+
+function refresh() { renderBars(); renderTable(); }
 
 function renderTotals(t) {
   const box = $("totals");
@@ -57,7 +104,9 @@ function renderBars() {
   const box = $("bars"); box.replaceChildren();
   for (const r of rows) {
     const row = el("div", "bar-row");
-    const id = el("span", "id", short(r.ProviderID)); id.title = r.ProviderID;
+    const name = nameOf(r.ProviderID);
+    const id = el("span", "id", name || short(r.ProviderID));
+    id.title = r.ProviderID + (name ? "\n" + sourceOf(r.ProviderID) : "");
     const track = el("div", "bar-track"), fill = el("div", "bar-fill");
     fill.style.width = (100 * r[metric] / max) + "%";
     track.append(fill);
@@ -102,15 +151,20 @@ function renderHist() {
 
 function renderTable() {
   const q = $("filter").value.trim().toLowerCase();
-  const rows = providers.filter(p => p.ProviderID.toLowerCase().includes(q))
+  const val = (p, k) => k === "Name" ? nameOf(p.ProviderID) : p[k];
+  const rows = providers.filter(p => (p.ProviderID + " " + nameOf(p.ProviderID)).toLowerCase().includes(q))
     .sort((a, b) => {
-      const x = a[sortKey], y = b[sortKey];
+      const x = val(a, sortKey), y = val(b, sortKey);
       const c = typeof x === "string" ? x.localeCompare(y) : x - y;
       return sortAsc ? c : -c;
     });
   const tb = document.querySelector("#table tbody"); tb.replaceChildren();
   for (const p of rows) {
     const tr = el("tr");
+    const name = nameOf(p.ProviderID);
+    const nm = el("td", "name", name || "–");
+    if (name) nm.title = sourceOf(p.ProviderID);
+    tr.append(nm);
     const id = el("td", "id", short(p.ProviderID)); id.title = p.ProviderID + " (click to copy)";
     id.style.cursor = "pointer";
     id.onclick = () => navigator.clipboard && navigator.clipboard.writeText(p.ProviderID);
@@ -130,7 +184,7 @@ $("topn").onchange = renderBars;
 $("filter").oninput = renderTable;
 document.querySelectorAll("#table th").forEach(th => th.onclick = () => {
   const k = th.dataset.key;
-  if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = k === "ProviderID"; }
+  if (sortKey === k) sortAsc = !sortAsc; else { sortKey = k; sortAsc = k === "ProviderID" || k === "Name"; }
   renderTable();
 });
 load();
