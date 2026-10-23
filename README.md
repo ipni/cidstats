@@ -15,24 +15,6 @@ A small static website that charts the provider metering data published at
 - **All providers:** filterable, sortable table. Peer IDs are shortened in the
   UI; hover for the full ID, click to copy.
 
-## How it works
-
-Plain HTML, CSS and JavaScript with no build step and no dependencies. The page
-fetches the JSON from cid.contact in the visitor's browser on every load, so
-the data is always current. cid.contact sends `access-control-allow-origin: *`,
-which is what makes this work. If the endpoint is unreachable the page shows an
-error message.
-
-Fonts (Bricolage Grotesque, IBM Plex Sans, IBM Plex Mono) are loaded from
-Google Fonts.
-
-| File | Purpose |
-| --- | --- |
-| `index.html` | Page structure |
-| `style.css` | Styling, with dark and light themes |
-| `app.js` | Fetches the data and renders charts and table |
-| `ipni.png` | IPNI logo, also used as the favicon |
-
 ## Run locally
 
 ```bash
