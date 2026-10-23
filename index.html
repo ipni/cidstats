@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPNI CID Stats</title>
+<meta name="description" content="Index provider metering statistics from the IPNI (cid.contact).">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>IPNI CID Stats</h1>
+  <p class="sub">Provider metering from <a href="https://cid.contact/metering/providers">cid.contact</a> · <span id="measured">loading…</span></p>
+</header>
+<main>
+  <div id="error" class="error" hidden></div>
+
+  <section>
+    <h2>Totals</h2>
+    <div id="totals" class="cards"></div>
+  </section>
+
+  <section>
+    <h2>Top providers</h2>
+    <div class="controls">
+      <label>Metric
+        <select id="metric">
+          <option value="Multihashes">Multihashes</option>
+          <option value="Slots">Slots</option>
+          <option value="DeletedContexts">Deleted contexts</option>
+        </select>
+      </label>
+      <label>Show top
+        <select id="topn">
+          <option>10</option><option selected>15</option><option>25</option><option>50</option>
+        </select>
+      </label>
+    </div>
+    <div id="bars" class="bars"></div>
+  </section>
+
+  <section>
+    <h2>Concentration</h2>
+    <div class="grid2">
+      <div>
+        <h3>Share of multihashes held by top providers</h3>
+        <div id="share" class="share"></div>
+      </div>
+      <div>
+        <h3>Providers by size (multihashes)</h3>
+        <div id="hist"></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>All providers</h2>
+    <input id="filter" type="search" placeholder="Filter by provider ID…" aria-label="Filter providers">
+    <div class="tablewrap">
+      <table id="table">
+        <thead><tr>
+          <th data-key="ProviderID">Provider ID</th>
+          <th data-key="Multihashes" class="num">Multihashes</th>
+          <th data-key="Slots" class="num">Slots</th>
+          <th data-key="DeletedContexts" class="num">Deleted contexts</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p id="count" class="sub"></p>
+  </section>
+</main>
+<footer>Data is fetched live from <a href="https://cid.contact/metering/providers">cid.contact/metering/providers</a>.</footer>
+<script src="app.js"></script>
+</body>
+</html>
